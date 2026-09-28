@@ -108,7 +108,7 @@ datawarehouse-project/
 
 - [x] Criação do banco e dos schemas (`scripts/init_database.sql`)
 - [x] DDL da camada Bronze (`scripts/bronze/ddl_bronze.sql`)
-- [x] Procedure de carga da Bronze (`scripts/bronze/proc_load_bronze.sql` → `bronze.load_bronze`)
+- [x] Procedure de carga da Bronze (`scripts/bronze/proc_load_bronze.sql` → `bronze.load_bronze`), testada e validada (18.494 + 397 + 60.398 + 18.484 + 18.484 + 37 linhas carregadas)
 - [ ] DDL da camada Prata (`scripts/silver/`)
 - [ ] Procedure de carga da Prata (`silver.load_silver`)
 - [ ] Views da camada Ouro (`gold.dim_customers`, `gold.dim_products`, `gold.fact_sales`)
