@@ -121,13 +121,19 @@ datawarehouse-project/
 
 ## ▶️ Como Executar
 
+0. **Disponibilize os CSVs para o servidor PostgreSQL** (só é necessário no Linux; ver aviso abaixo):
+   ```bash
+   sudo mkdir -p /srv/datawarehouse-datasets
+   sudo cp -r datasets/* /srv/datawarehouse-datasets/
+   sudo chmod -R a+rX /srv/datawarehouse-datasets
+   ```
 1. Rode `scripts/init_database.sql`: primeiro a Parte 1, conectado ao banco `postgres`, para (re)criar o banco `datawarehouse`; depois a Parte 2, já conectado ao banco `datawarehouse`, para criar os schemas `bronze`, `silver` e `gold`.
 2. Rode `scripts/bronze/ddl_bronze.sql` para criar as tabelas da Bronze e carregue os dados com `CALL bronze.load_bronze();`
 3. (Ainda não implementado) Crie as tabelas da Prata e carregue os dados com `CALL silver.load_silver();`
 4. (Ainda não implementado) Rode os scripts de `scripts/gold/` para criar as views da camada Ouro.
 5. (Ainda não implementado) Rode os scripts de `tests/` para validar a qualidade dos dados.
 
-> ⚠️ O parâmetro `p_caminho_base` de `bronze.load_bronze` deve apontar para a pasta `datasets` no computador onde o **servidor** PostgreSQL está rodando (o `COPY` é executado pelo servidor, não pelo cliente). Ajuste o valor padrão em `proc_load_bronze.sql` ou passe o caminho na chamada, ex.: `CALL bronze.load_bronze('/caminho/para/datasets');`
+> ⚠️ O parâmetro `p_caminho_base` de `bronze.load_bronze` deve apontar para uma pasta no computador onde o **servidor** PostgreSQL está rodando (o `COPY` é executado pelo servidor, não pelo cliente) — o padrão é `/srv/datawarehouse-datasets` (passo 0 acima). Em muitas distros Linux, o serviço `postgresql` roda com o hardening `ProtectHome=true` do systemd, que torna `/home` inteiro invisível para o processo do servidor mesmo com as permissões de arquivo corretas — por isso os CSVs precisam estar fora de `/home` (e não dentro de `datasets/` no próprio repositório). Ajuste o valor padrão em `proc_load_bronze.sql` ou passe o caminho na chamada, ex.: `CALL bronze.load_bronze('/caminho/para/datasets');`
 
 ---
 

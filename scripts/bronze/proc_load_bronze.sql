@@ -19,6 +19,13 @@ Parâmetro:
     Cada pessoa que rodar a procedure deve ajustar o valor padrão abaixo
     para a sua própria máquina, ou informar o caminho na chamada (ver abaixo).
 
+    Em muitas distros Linux, o serviço 'postgresql' roda em sandbox do
+    systemd com 'ProtectHome=true', que torna TODO o /home invisível para
+    o processo do servidor (mesmo com as permissões de arquivo corretas).
+    Por isso o caminho padrão aqui aponta para fora do /home
+    (/srv/datawarehouse-datasets) em vez de para a pasta 'datasets/' do
+    repositório. Veja instruções para copiar os CSVs para lá no README.
+
 Como usar:
     CALL bronze.load_bronze();                   -- usa o caminho padrão
     CALL bronze.load_bronze('/outro/caminho');   -- usa outro caminho
@@ -27,7 +34,7 @@ Como usar:
 */
 
 CREATE OR REPLACE PROCEDURE bronze.load_bronze(
-    p_caminho_base TEXT DEFAULT '/home/renan/programas/2026/eescjr/treinamentoDataWarehouse/datawarehouse-project/datasets'   -- ajuste para a sua pasta
+    p_caminho_base TEXT DEFAULT '/srv/datawarehouse-datasets'   -- ajuste para a sua pasta
 )
 LANGUAGE plpgsql
 AS $$
@@ -167,3 +174,5 @@ EXCEPTION
         RAISE;
 END;
 $$;
+
+-- select * from bronze.crm_cust_info;
