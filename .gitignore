@@ -29,3 +29,6 @@ obj/
 *.bak
 *.log
 
+# Claude Code project instructions (local only, not shared via git)
+CLAUDE.md
+

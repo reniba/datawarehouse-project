@@ -9,9 +9,9 @@ Este projeto constrói um data warehouse completo em SQL, desde a ingestão dos 
 
 O projeto segue a **Arquitetura Medalhão**, com as camadas **Bronze**, **Prata (Silver)** e **Ouro (Gold)**:
 
-![Arquitetura de Dados](docs/data_architecture.png)
+![Arquitetura de Dados](docs/arquitetura.png)
 
-1. **Camada Bronze**: armazena os dados brutos exatamente como vieram dos sistemas de origem. Os dados são carregados dos arquivos CSV para o banco SQL Server com `BULK INSERT`.
+1. **Camada Bronze**: armazena os dados brutos exatamente como vieram dos sistemas de origem. Os dados são carregados dos arquivos CSV para o banco PostgreSQL com `COPY`.
 2. **Camada Prata**: faz a limpeza, padronização e normalização dos dados (remoção de duplicados, tratamento de nulos e datas inválidas, padronização de valores) para prepará-los para análise.
 3. **Camada Ouro**: contém os dados prontos para o negócio, modelados em **esquema estrela** (star schema) por meio de views, voltados para relatórios e análises.
 
@@ -49,8 +49,8 @@ Os dados vêm de **dois sistemas de origem**, fornecidos como arquivos CSV:
 
 ## 🛠️ Ferramentas Utilizadas
 
-- **[SQL Server Express](https://www.microsoft.com/pt-br/sql-server/sql-server-downloads):** servidor leve para hospedar o banco de dados.
-- **[SQL Server Management Studio (SSMS)](https://learn.microsoft.com/pt-br/sql/ssms/download-sql-server-management-studio-ssms):** interface para gerenciar e consultar o banco.
+- **[PostgreSQL](https://www.postgresql.org/download/):** servidor de banco de dados usado no projeto.
+- **Um cliente SQL** (ex.: [psql](https://www.postgresql.org/docs/current/app-psql.html), [pgAdmin](https://www.pgadmin.org/) ou [DBeaver](https://dbeaver.io/)): para conectar e executar os scripts no banco.
 - **[GitHub](https://github.com/):** versionamento do código.
 - **[Draw.io](https://www.drawio.com/):** diagramas de arquitetura, fluxo e modelo de dados.
 
@@ -61,7 +61,7 @@ Os dados vêm de **dois sistemas de origem**, fornecidos como arquivos CSV:
 ### Construção do Data Warehouse (Engenharia de Dados)
 
 #### Objetivo
-Desenvolver um data warehouse moderno em SQL Server para consolidar dados de vendas, permitindo relatórios analíticos e tomada de decisão embasada.
+Desenvolver um data warehouse moderno em PostgreSQL para consolidar dados de vendas, permitindo relatórios analíticos e tomada de decisão embasada.
 
 #### Especificações
 - **Fontes de Dados**: importar dados de dois sistemas (ERP e CRM) fornecidos como CSV.
@@ -83,15 +83,13 @@ Desenvolver análises em SQL que tragam insights sobre:
 ## 📂 Estrutura do Repositório
 
 ```
-sql-data-warehouse-project/
+datawarehouse-project/
 │
 ├── datasets/                           # Dados brutos usados no projeto (CRM e ERP)
 │
 ├── docs/                               # Documentação e diagramas do projeto
-│   ├── data_architecture.drawio        # Arquitetura do projeto
-│   ├── data_catalog.md                 # Catálogo dos dados, com descrição dos campos
-│   ├── data_flow.drawio                # Diagrama do fluxo de dados
-│   ├── data_models.drawio              # Modelo de dados (esquema estrela)
+│   ├── arquitetura.drawio              # Arquitetura do projeto
+│   ├── arquitetura.png                 # Diagrama exportado como imagem
 │   ├── naming-conventions.md           # Convenções de nomenclatura de tabelas, colunas e arquivos
 │
 ├── scripts/                            # Scripts SQL de ETL e transformação
@@ -100,23 +98,36 @@ sql-data-warehouse-project/
 │   ├── silver/                         # Limpeza e transformação (camada Prata)
 │   ├── gold/                           # Views do modelo analítico (camada Ouro)
 │
-├── tests/                              # Scripts de verificação de qualidade dos dados
-│
 ├── README.md                           # Visão geral do projeto
 └── .gitignore                          # Arquivos ignorados pelo Git
 ```
 
 ---
 
+## ✅ Status do Projeto
+
+- [x] Criação do banco e dos schemas (`scripts/init_database.sql`)
+- [x] DDL da camada Bronze (`scripts/bronze/ddl_bronze.sql`)
+- [x] Procedure de carga da Bronze (`scripts/bronze/proc_load_bronze.sql` → `bronze.load_bronze`)
+- [ ] DDL da camada Prata (`scripts/silver/`)
+- [ ] Procedure de carga da Prata (`silver.load_silver`)
+- [ ] Views da camada Ouro (`gold.dim_customers`, `gold.dim_products`, `gold.fact_sales`)
+- [ ] Catálogo de dados (`docs/data_catalog.md`)
+- [ ] Diagramas de fluxo de dados e de modelo de dados (esquema estrela)
+- [ ] Scripts de teste/qualidade de dados (`tests/`)
+- [ ] Consultas de analytics e relatórios (comportamento de clientes, desempenho de produtos, tendências de vendas)
+
+---
+
 ## ▶️ Como Executar
 
-1. Rode `scripts/init_database.sql` para criar o banco `DataWarehouse` e os schemas `bronze`, `silver` e `gold`.
-2. Crie as tabelas da Bronze e carregue os dados com `EXEC bronze.load_bronze;`
-3. Crie as tabelas da Prata e carregue os dados com `EXEC silver.load_silver;`
-4. Rode os scripts de `scripts/gold/` para criar as views da camada Ouro.
-5. (Opcional) Rode os scripts de `tests/` para validar a qualidade dos dados.
+1. Rode `scripts/init_database.sql`: primeiro a Parte 1, conectado ao banco `postgres`, para (re)criar o banco `datawarehouse`; depois a Parte 2, já conectado ao banco `datawarehouse`, para criar os schemas `bronze`, `silver` e `gold`.
+2. Rode `scripts/bronze/ddl_bronze.sql` para criar as tabelas da Bronze e carregue os dados com `CALL bronze.load_bronze();`
+3. (Ainda não implementado) Crie as tabelas da Prata e carregue os dados com `CALL silver.load_silver();`
+4. (Ainda não implementado) Rode os scripts de `scripts/gold/` para criar as views da camada Ouro.
+5. (Ainda não implementado) Rode os scripts de `tests/` para validar a qualidade dos dados.
 
-> ⚠️ Ajuste os caminhos dos arquivos CSV no `BULK INSERT` para a pasta onde os datasets estão no seu computador.
+> ⚠️ O parâmetro `p_caminho_base` de `bronze.load_bronze` deve apontar para a pasta `datasets` no computador onde o **servidor** PostgreSQL está rodando (o `COPY` é executado pelo servidor, não pelo cliente). Ajuste o valor padrão em `proc_load_bronze.sql` ou passe o caminho na chamada, ex.: `CALL bronze.load_bronze('/caminho/para/datasets');`
 
 ---
 
@@ -126,5 +137,5 @@ Projeto baseado no tutorial gratuito de **Baraa Khatib Salkini ([Data With Baraa
 
 ## 👤 Autor
 
-**[Seu Nome]** – Trainee 2026.2 do Núcleo de Dados da EESC jr.
-[LinkedIn](https://linkedin.com/in/seu-perfil) · [GitHub](https://github.com/seu-usuario)
+**Renan Correia Monteiro Soares** – Trainee 2026.2 do Núcleo de Dados da EESC jr.
+[LinkedIn] (https://www.linkedin.com/in/renan-correia-064a36209/) · [GitHub](https://github.com/reniba)
