@@ -53,7 +53,7 @@ Tabelas da Bronze no projeto:
   - `<entidade>`: nome exato da tabela no sistema de origem.
   - Exemplo: `silver.crm_cust_info` → clientes do CRM, já limpos e padronizados.
 
-A Prata tem as mesmas seis tabelas da Bronze, no schema `silver`.
+A Prata tem as mesmas seis tabelas da Bronze, no schema `silver`. Em `silver.crm_prd_info`, a chave `prd_key` da origem é separada em `cat_id` (categoria, ex.: `CO_RF`) e `prd_key` (chave do produto, igual a `sls_prd_key` de `crm_sales_details`).
 
 ### **Regras da Ouro**
 - Os nomes devem ser claros e alinhados ao negócio, começando pelo prefixo da categoria.
@@ -90,7 +90,7 @@ A Prata tem as mesmas seis tabelas da Bronze, no schema `silver`.
 - **`dwh_<nome_da_coluna>`**
   - `dwh`: prefixo exclusivo para metadados gerados pelo sistema (não vêm da origem).
   - `<nome_da_coluna>`: nome descritivo da finalidade da coluna.
-  - Exemplo: `dwh_create_date` → data e hora em que o registro foi carregado na camada Prata (preenchida automaticamente com `GETDATE()`).
+  - Exemplo: `dwh_create_date` → data e hora em que o registro foi carregado na camada Prata (preenchida automaticamente com `now()` pelo `DEFAULT` da coluna).
 
 ## **Stored Procedures**
 

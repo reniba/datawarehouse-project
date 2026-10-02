@@ -32,3 +32,6 @@ obj/
 # Claude Code project instructions (local only, not shared via git)
 CLAUDE.md
 
+
+# Análises exploratórias locais da camada Silver (não sobem para o repositório)
+scripts/silver/eda.sql

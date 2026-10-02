@@ -109,12 +109,13 @@ datawarehouse-project/
 - [x] Criação do banco e dos schemas (`scripts/init_database.sql`)
 - [x] DDL da camada Bronze (`scripts/bronze/ddl_bronze.sql`)
 - [x] Procedure de carga da Bronze (`scripts/bronze/proc_load_bronze.sql` → `bronze.load_bronze`), testada e validada (18.494 + 397 + 60.398 + 18.484 + 18.484 + 37 linhas carregadas)
-- [ ] DDL da camada Prata (`scripts/silver/`)
-- [ ] Procedure de carga da Prata (`silver.load_silver`)
+- [x] DDL da camada Prata (`scripts/silver/ddl_silver.sql`)
+- [x] Procedure de carga da Prata (`scripts/silver/proc_load_silver.sql` → `silver.load_silver`), com mensagens de progresso, duração por etapa e tratamento de erro
 - [ ] Views da camada Ouro (`gold.dim_customers`, `gold.dim_products`, `gold.fact_sales`)
 - [ ] Catálogo de dados (`docs/data_catalog.md`)
 - [ ] Diagramas de fluxo de dados e de modelo de dados (esquema estrela)
-- [ ] Scripts de teste/qualidade de dados (`tests/`)
+- [x] Testes de qualidade da camada Prata (`scripts/silver/tests.sql`): 44 testes de chaves, espaços, padronização, datas, consistência e integridade
+- [ ] Testes de qualidade da camada Ouro
 - [ ] Consultas de analytics e relatórios (comportamento de clientes, desempenho de produtos, tendências de vendas)
 
 ---
@@ -129,9 +130,9 @@ datawarehouse-project/
    ```
 1. Rode `scripts/init_database.sql`: primeiro a Parte 1, conectado ao banco `postgres`, para (re)criar o banco `datawarehouse`; depois a Parte 2, já conectado ao banco `datawarehouse`, para criar os schemas `bronze`, `silver` e `gold`.
 2. Rode `scripts/bronze/ddl_bronze.sql` para criar as tabelas da Bronze e carregue os dados com `CALL bronze.load_bronze();`
-3. (Ainda não implementado) Crie as tabelas da Prata e carregue os dados com `CALL silver.load_silver();`
+3. Rode `scripts/silver/ddl_silver.sql` para criar as tabelas da Prata, rode `scripts/silver/proc_load_silver.sql` para criar a procedure e carregue os dados com `CALL silver.load_silver();`
 4. (Ainda não implementado) Rode os scripts de `scripts/gold/` para criar as views da camada Ouro.
-5. (Ainda não implementado) Rode os scripts de `tests/` para validar a qualidade dos dados.
+5. Rode `scripts/silver/tests.sql` para validar a qualidade da Prata (todos os testes devem aparecer como `OK`).
 
 > ⚠️ O parâmetro `p_caminho_base` de `bronze.load_bronze` deve apontar para uma pasta no computador onde o **servidor** PostgreSQL está rodando (o `COPY` é executado pelo servidor, não pelo cliente) — o padrão é `/srv/datawarehouse-datasets` (passo 0 acima). Em muitas distros Linux, o serviço `postgresql` roda com o hardening `ProtectHome=true` do systemd, que torna `/home` inteiro invisível para o processo do servidor mesmo com as permissões de arquivo corretas — por isso os CSVs precisam estar fora de `/home` (e não dentro de `datasets/` no próprio repositório). Ajuste o valor padrão em `proc_load_bronze.sql` ou passe o caminho na chamada, ex.: `CALL bronze.load_bronze('/caminho/para/datasets');`
 
