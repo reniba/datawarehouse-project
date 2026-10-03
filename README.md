@@ -9,7 +9,7 @@ Este projeto constrói um data warehouse completo em SQL, desde a ingestão dos 
 
 O projeto segue a **Arquitetura Medalhão**, com as camadas **Bronze**, **Prata (Silver)** e **Ouro (Gold)**:
 
-![Arquitetura de Dados](docs/arquitetura.png)
+![Arquitetura de Dados](docs/arquitetura-dados.png)
 
 1. **Camada Bronze**: armazena os dados brutos exatamente como vieram dos sistemas de origem. Os dados são carregados dos arquivos CSV para o banco PostgreSQL com `COPY`.
 2. **Camada Prata**: faz a limpeza, padronização e normalização dos dados (remoção de duplicados, tratamento de nulos e datas inválidas, padronização de valores) para prepará-los para análise.
@@ -44,6 +44,25 @@ Os dados vêm de **dois sistemas de origem**, fornecidos como arquivos CSV:
 | `gold.dim_customers` | Dimensão | Clientes com dados integrados do CRM e do ERP |
 | `gold.dim_products` | Dimensão | Produtos ativos com suas categorias e subcategorias |
 | `gold.fact_sales` | Fato | Vendas, ligadas às dimensões por chaves substitutas (surrogate keys) |
+
+---
+
+## 🗺️ Diagramas
+
+Todos os diagramas são editáveis em [`docs/diagramas.drawio`](docs/diagramas.drawio) (Draw.io, uma página por diagrama).
+
+| Diagrama | Descrição |
+|---|---|
+| ![Fluxo de Dados](docs/fluxo-dados.png) | **Fluxo de dados:** como cada tabela de origem passa pelas camadas Bronze, Prata e Ouro até chegar às views finais. |
+| ![Modelo de Integração](docs/modelo-integracao-dados.png) | **Integração das fontes:** como as tabelas do CRM e do ERP se relacionam entre si. |
+| ![Modelo de Dados](docs/modelo-dados.png) | **Modelo de dados (esquema estrela):** `fact_sales` ligada a `dim_customers` e `dim_products` por chaves substitutas. |
+
+---
+
+## 📚 Documentação
+
+- [Catálogo de dados](docs/catalogo-de-dados.md): descrição das views e colunas da camada Ouro.
+- [Convenções de nomenclatura](docs/convencao-de-nomenclatura.md): regras de nomes de schemas, tabelas, colunas e procedures.
 
 ---
 
@@ -88,15 +107,20 @@ datawarehouse-project/
 ├── datasets/                           # Dados brutos usados no projeto (CRM e ERP)
 │
 ├── docs/                               # Documentação e diagramas do projeto
-│   ├── arquitetura.drawio              # Arquitetura do projeto
-│   ├── arquitetura.png                 # Diagrama exportado como imagem
-│   ├── naming-conventions.md           # Convenções de nomenclatura de tabelas, colunas e arquivos
+│   ├── diagramas.drawio                # Diagramas editáveis (arquitetura, fluxo, integração e modelo de dados)
+│   ├── arquitetura-dados.png           # Arquitetura de dados (imagem)
+│   ├── fluxo-dados.png                 # Fluxo de dados entre as camadas (imagem)
+│   ├── modelo-integracao-dados.png     # Integração entre as tabelas do CRM e do ERP (imagem)
+│   ├── modelo-dados.png                # Modelo de dados em esquema estrela (imagem)
+│   ├── catalogo-de-dados.md            # Catálogo de dados da camada Ouro
+│   ├── convencao-de-nomenclatura.md    # Convenções de nomenclatura de tabelas, colunas e arquivos
 │
-├── scripts/                            # Scripts SQL de ETL e transformação
+├── scripts/                            # Scripts SQL de ETL, transformação e testes
 │   ├── init_database.sql               # Criação do banco e dos schemas
-│   ├── bronze/                         # Criação e carga da camada Bronze
-│   ├── silver/                         # Limpeza e transformação (camada Prata)
+│   ├── bronze/                         # DDL e procedure de carga da camada Bronze
+│   ├── silver/                         # DDL e procedure de carga da camada Prata
 │   ├── gold/                           # Views do modelo analítico (camada Ouro)
+│   ├── tests/                          # Testes de qualidade das camadas Prata e Ouro
 │
 ├── README.md                           # Visão geral do projeto
 └── .gitignore                          # Arquivos ignorados pelo Git
@@ -112,10 +136,10 @@ datawarehouse-project/
 - [x] DDL da camada Prata (`scripts/silver/ddl_silver.sql`)
 - [x] Procedure de carga da Prata (`scripts/silver/proc_load_silver.sql` → `silver.load_silver`), com mensagens de progresso, duração por etapa e tratamento de erro
 - [x] Views da camada Ouro (`scripts/gold/ddl_gold.sql`: `gold.dim_customers`, `gold.dim_products`, `gold.fact_sales`)
-- [x] Catálogo de dados (`docs/data_catalog.md`)
-- [ ] Diagramas de fluxo de dados e de modelo de dados (esquema estrela)
-- [x] Testes de qualidade da camada Prata (`scripts/silver/tests.sql`): 44 testes de chaves, espaços, padronização, datas, consistência e integridade
-- [x] Testes de qualidade da camada Ouro (`scripts/gold/tests.sql`): 34 testes de chaves, padronização, datas, integridade referencial e reconciliação com a Prata
+- [x] Catálogo de dados (`docs/catalogo-de-dados.md`)
+- [x] Diagramas de arquitetura, fluxo de dados, integração e modelo de dados (`docs/diagramas.drawio`)
+- [x] Testes de qualidade da camada Prata (`scripts/tests/quality_check_silver.sql`): 44 testes de chaves, espaços, padronização, datas, consistência e integridade
+- [x] Testes de qualidade da camada Ouro (`scripts/tests/quality_check_gold.sql`): 34 testes de chaves, padronização, datas, integridade referencial e reconciliação com a Prata
 - [ ] Consultas de analytics e relatórios (comportamento de clientes, desempenho de produtos, tendências de vendas)
 
 ---
@@ -131,8 +155,10 @@ datawarehouse-project/
 1. Rode `scripts/init_database.sql`: primeiro a Parte 1, conectado ao banco `postgres`, para (re)criar o banco `datawarehouse`; depois a Parte 2, já conectado ao banco `datawarehouse`, para criar os schemas `bronze`, `silver` e `gold`.
 2. Rode `scripts/bronze/ddl_bronze.sql` para criar as tabelas da Bronze e carregue os dados com `CALL bronze.load_bronze();`
 3. Rode `scripts/silver/ddl_silver.sql` para criar as tabelas da Prata, rode `scripts/silver/proc_load_silver.sql` para criar a procedure e carregue os dados com `CALL silver.load_silver();`
-4. Rode `scripts/gold/ddl_gold.sql` para criar as views da camada Ouro e `scripts/gold/tests.sql` para validá-las.
-5. Rode `scripts/silver/tests.sql` para validar a qualidade da Prata (todos os testes devem aparecer como `OK`).
+4. Rode `scripts/gold/ddl_gold.sql` para criar as views da camada Ouro.
+5. Rode os testes de qualidade, todos os testes devem aparecer como `OK`:
+   - `scripts/tests/quality_check_silver.sql` (camada Prata, depois do passo 3);
+   - `scripts/tests/quality_check_gold.sql` (camada Ouro, depois do passo 4).
 
 > ⚠️ O parâmetro `p_caminho_base` de `bronze.load_bronze` deve apontar para uma pasta no computador onde o **servidor** PostgreSQL está rodando (o `COPY` é executado pelo servidor, não pelo cliente) — o padrão é `/srv/datawarehouse-datasets` (passo 0 acima). Em muitas distros Linux, o serviço `postgresql` roda com o hardening `ProtectHome=true` do systemd, que torna `/home` inteiro invisível para o processo do servidor mesmo com as permissões de arquivo corretas — por isso os CSVs precisam estar fora de `/home` (e não dentro de `datasets/` no próprio repositório). Ajuste o valor padrão em `proc_load_bronze.sql` ou passe o caminho na chamada, ex.: `CALL bronze.load_bronze('/caminho/para/datasets');`
 
@@ -145,4 +171,4 @@ Projeto baseado no tutorial gratuito de **Baraa Khatib Salkini ([Data With Baraa
 ## 👤 Autor
 
 **Renan Correia Monteiro Soares** – Trainee 2026.2 do Núcleo de Dados da EESC jr.
-[LinkedIn] (https://www.linkedin.com/in/renan-correia-064a36209/) · [GitHub](https://github.com/reniba)
+[LinkedIn](https://www.linkedin.com/in/renan-correia-064a36209/) · [GitHub](https://github.com/reniba)

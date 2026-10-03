@@ -22,7 +22,7 @@ Objetivo do script:
                        a categoria ligada por cat_id;
       - fact_sales   : usa LEFT JOIN, então nenhuma venda é descartada; uma
                        venda sem cliente ou produto ficaria com a chave NULL
-                       (verificado em tests.sql).
+                       (verificado em scripts/tests/quality_check_gold.sql).
 
 Como executar:
     Conectado ao banco 'datawarehouse', DEPOIS de carregar a Silver
@@ -30,7 +30,7 @@ Como executar:
     executado várias vezes: cada view é apagada (DROP VIEW IF EXISTS) e
     recriada. A fato é apagada primeiro porque depende das dimensões.
 
-Depois de executar, rode scripts/gold/tests.sql para validar a camada.
+Depois de executar, rode scripts/tests/quality_check_gold.sql para validar a camada.
 ===============================================================================
 */
 
