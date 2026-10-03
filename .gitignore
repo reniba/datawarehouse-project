@@ -35,3 +35,4 @@ CLAUDE.md
 
 # Análises exploratórias locais da camada Silver (não sobem para o repositório)
 scripts/silver/eda.sql
+scripts/gold/test.sql
