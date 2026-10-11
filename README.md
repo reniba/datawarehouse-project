@@ -128,22 +128,6 @@ datawarehouse-project/
 
 ---
 
-## ✅ Status do Projeto
-
-- [x] Criação do banco e dos schemas (`scripts/init_database.sql`)
-- [x] DDL da camada Bronze (`scripts/bronze/ddl_bronze.sql`)
-- [x] Procedure de carga da Bronze (`scripts/bronze/proc_load_bronze.sql` → `bronze.load_bronze`), testada e validada (18.494 + 397 + 60.398 + 18.484 + 18.484 + 37 linhas carregadas)
-- [x] DDL da camada Prata (`scripts/silver/ddl_silver.sql`)
-- [x] Procedure de carga da Prata (`scripts/silver/proc_load_silver.sql` → `silver.load_silver`), com mensagens de progresso, duração por etapa e tratamento de erro
-- [x] Views da camada Ouro (`scripts/gold/ddl_gold.sql`: `gold.dim_customers`, `gold.dim_products`, `gold.fact_sales`)
-- [x] Catálogo de dados (`docs/catalogo-de-dados.md`)
-- [x] Diagramas de arquitetura, fluxo de dados, integração e modelo de dados (`docs/diagramas.drawio`)
-- [x] Testes de qualidade da camada Prata (`scripts/tests/quality_check_silver.sql`): 44 testes de chaves, espaços, padronização, datas, consistência e integridade
-- [x] Testes de qualidade da camada Ouro (`scripts/tests/quality_check_gold.sql`): 34 testes de chaves, padronização, datas, integridade referencial e reconciliação com a Prata
-- [ ] Consultas de analytics e relatórios (comportamento de clientes, desempenho de produtos, tendências de vendas)
-
----
-
 ## ▶️ Como Executar
 
 0. **Disponibilize os CSVs para o servidor PostgreSQL** (só é necessário no Linux; ver aviso abaixo):
