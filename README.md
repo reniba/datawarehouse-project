@@ -17,17 +17,6 @@ O projeto segue a **Arquitetura Medalhão**, com as camadas **Bronze**, **Prata 
 
 ---
 
-## 📖 Visão Geral do Projeto
-
-O projeto envolve:
-
-1. **Arquitetura de Dados**: desenho de um data warehouse moderno usando a Arquitetura Medalhão.
-2. **Pipelines de ETL**: extração, transformação e carga dos dados dos sistemas de origem para o warehouse.
-3. **Modelagem de Dados**: criação de tabelas de fatos e dimensões otimizadas para consultas analíticas.
-4. **Analytics e Relatórios**: consultas SQL que geram insights para o negócio.
-
----
-
 ## 📥 Fontes de Dados
 
 Os dados vêm de **dois sistemas de origem**, fornecidos como arquivos CSV:
@@ -72,30 +61,6 @@ Todos os diagramas são editáveis em [`docs/diagramas.drawio`](docs/diagramas.d
 - **Um cliente SQL** (ex.: [psql](https://www.postgresql.org/docs/current/app-psql.html), [pgAdmin](https://www.pgadmin.org/) ou [DBeaver](https://dbeaver.io/)): para conectar e executar os scripts no banco.
 - **[GitHub](https://github.com/):** versionamento do código.
 - **[Draw.io](https://www.drawio.com/):** diagramas de arquitetura, fluxo e modelo de dados.
-
----
-
-## 🚀 Requisitos do Projeto
-
-### Construção do Data Warehouse (Engenharia de Dados)
-
-#### Objetivo
-Desenvolver um data warehouse moderno em PostgreSQL para consolidar dados de vendas, permitindo relatórios analíticos e tomada de decisão embasada.
-
-#### Especificações
-- **Fontes de Dados**: importar dados de dois sistemas (ERP e CRM) fornecidos como CSV.
-- **Qualidade dos Dados**: limpar e resolver problemas de qualidade antes da análise.
-- **Integração**: combinar as duas fontes em um único modelo de dados, fácil de usar e voltado a consultas analíticas.
-- **Escopo**: considerar apenas o conjunto de dados mais recente; não é necessário manter histórico.
-- **Documentação**: documentar o modelo de dados de forma clara para as áreas de negócio e de análise.
-
-### BI: Analytics e Relatórios (Análise de Dados)
-
-#### Objetivo
-Desenvolver análises em SQL que tragam insights sobre:
-- **Comportamento dos clientes**
-- **Desempenho dos produtos**
-- **Tendências de vendas**
 
 ---
 
